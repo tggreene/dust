@@ -30,7 +30,10 @@ set_load_path
 run_dust="$pixie_path -l $base_path/src $load_path $base_path/run.pxi"
 
 case $1 in
-    ""|"repl")
+    ""|-h|--help)
+        $run_dust help
+        ;;
+    "repl")
         rlwrap_cmd=""
         if [ -n "`which rlwrap`" ]; then
             rlwrap_cmd="rlwrap -aignored -n"
@@ -42,9 +45,6 @@ case $1 in
         file=$1
         shift
         $pixie_path $load_path $file $@
-        ;;
-    -h|--help)
-        $run_dust help
         ;;
     *)
         $run_dust $@

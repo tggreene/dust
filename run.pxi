@@ -37,30 +37,30 @@
   (let [name (str (if (not= ns "pixie.stdlib") (str ns "/") (str ns "/")))]
   ;loads other possible namespaces in case function is in other namespace
     (if (= @show-all true) (eval   (read-string (str "(require " ns ")"))))
-      
+
     (let [data (meta (eval (read-string (str name function))))]
       (print (str "\n  " name function "\n\n\t"))
       (let [func-name (if (not= (str/index-of function "/") nil) (str function) (str name function))]
         (loop [sigs (lazy-seq (:signatures data))]
-          (when (not= sigs '()) 
+          (when (not= sigs '())
             (print (str/replace (str (lazy-seq (first sigs)) "  ") "(" (str "(" func-name " ")))
             (recur (rest sigs)))))
 
       (if (nil? data)
-        (do 
+        (do
           (println "\n\n\t No documentation available.\n")
           (reset! unknown-command false)
           (if (= (first @namespaces) "") (reset! namespaces '())))
         (do
           (print (str "\n\n\t"))
           (print
-            (if (not= (str (:doc data)) "nil") 
+            (if (not= (str (:doc data)) "nil")
                 (str (:doc data) " ")
                 (str "No further documentation available.\n")))
           (reset! unknown-command false)
-          (print 
-            (if (not= (str (:added data)) "nil") 
-                (str " [added: v" (:added data) "]\n\n") 
+          (print
+            (if (not= (str (:added data)) "nil")
+                (str " [added: v" (:added data) "]\n\n")
                 (str "\n\n")))
           (if (= (first @namespaces) "pixie.stdlib")
             (reset! namespaces '())))))))
@@ -72,11 +72,11 @@
   [function-name & search-all]
   (if (= (str (first search-all)) "-all") (reset! show-all true))
   (loop [_ 0]
-    (when (not= @namespaces '()) 
+    (when (not= @namespaces '())
       (try (showdoc (str (first @namespaces)) (str function-name))
         (catch e
-         nil)) 
-         (recur (reset! namespaces (rest @namespaces)))))
+         nil
+         (recur (reset! namespaces (rest @namespaces)))))))
   (if (= @unknown-command true) (println (str "\n  " function-name "\n\n\t Function not found. " (if (not= (str (first search-all)) "-all") (str "Broaden search using -all flag.\n") (str "\n"))))))
 
 (defcmd deps
@@ -154,7 +154,7 @@
     (help-cmd cmd)
     (help-all)))
 
-(def *command* (first program-arguments))
+(def *command* (or (first program-arguments) "help"))
 
 (let [cmd (get @*all-commands* (symbol *command*))]
   (try
